@@ -1,0 +1,85 @@
+package de.uniba.wiai.dsg.ajp.assignment2;
+
+import java.util.Scanner;
+
+
+
+public class Main {
+    public static String[] firstMenu = {"Exit", "Validate and Load Project", "Create New Project" };
+    public static String[] secondMenu = {   "Exit",
+                                            "Remove Milestone and Cleanup",
+                                            "List Milestones",
+                                            "Add Issue",
+                                            "Close Issue",
+                                            "Remove Issue and Cleanup",
+                                            "List Issues",
+                                            "Print JSON on Console",
+                                            "Save JSON to File",
+                                            "Add Milestone"};
+    public static String[] displayArray = firstMenu;
+
+
+	public static void main(String[] args) {
+        int menuDepth = 0;
+		Scanner scanner = new Scanner(System.in);
+        selectionMenu(scanner, menuDepth);
+		scanner.close();
+	}
+
+    public static void selectionMenu(Scanner scanner, int menuDepth) {
+
+        printOptions();
+
+        int index = Integer.parseInt(getValidUserInput(scanner,"int"));
+        //String newString = getValidUserInput(scanner,"string");
+
+        if (index >= 0 && index < displayArray.length) {
+
+            switch(index) {
+                case 0: System.out.println("Exiting!"); return;
+                case 1: System.out.println("You selected Validate and Load Project...");
+                        drawBar();
+                        displayArray = secondMenu;
+                        menuDepth = 1;
+                        break;
+                case 2: break;
+            }
+
+        } else {
+            System.out.println("Invalid Selection. Please try again.");
+        }
+
+        selectionMenu(scanner, menuDepth);
+    }
+
+    public static void printOptions() {
+        System.out.println("Select an option by entering the index (0-" + (displayArray.length - 1) + "):");
+        for (int i = 1; i < displayArray.length; i++) {
+            System.out.println("(" + i + ")" + " " + displayArray[i]);
+        }
+        System.out.println("(" + 0 + ")" + " " + displayArray[0]);
+    }
+
+    public static String getValidUserInput(Scanner scanner, String type) {
+        while (true) {
+            if (scanner.hasNextInt() && type == "int") {
+                return Integer.toString(scanner.nextInt());
+            } else {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine();
+            }
+
+            if (scanner.hasNextLine() && type == "string") {
+                return scanner.nextLine();
+            } else {
+                System.out.println("Invalid input. Please enter a valid String.");
+                scanner.nextLine();
+            }
+        }
+    }
+
+    public static void drawBar() {
+        System.out.println("----------------------------------");
+    }
+
+}

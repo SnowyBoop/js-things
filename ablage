@@ -1,10 +1,21 @@
 package de.uniba.wiai.dsg.ajp.assignment2;
 
 import java.util.Scanner;
-import de.uniba.wiai.dsg.ajp.assignment2.*;
+import java.util.List;
+import java.util.Set;
+import de.uniba.wiai.dsg.ajp.assignment2.issuetracking.logic.ProjectServiceImpl;
+import de.uniba.wiai.dsg.ajp.assignment2.issuetracking.logic.IssueTrackerImpl;
+import de.uniba.wiai.dsg.ajp.assignment2.issuetracking.IssueTrackingException;
+import de.uniba.wiai.dsg.ajp.assignment2.issuetracking.ProjectService;
+import de.uniba.wiai.dsg.ajp.assignment2.issuetracking.model.Issue;
+import de.uniba.wiai.dsg.ajp.assignment2.issuetracking.model.Milestone;
+import de.uniba.wiai.dsg.ajp.assignment2.issuetracking.model.Severity;
+import de.uniba.wiai.dsg.ajp.assignment2.issuetracking.model.Type;
+
 public class Main {
     public static String[] firstMenu = {"Exit", "Validate and Load Project", "Create New Project" };
     public static String[] secondMenu = {   "Exit",
+                                            "Add Milestone",
                                             "Remove Milestone and Cleanup",
                                             "List Milestones",
                                             "Add Issue",
@@ -15,36 +26,23 @@ public class Main {
                                             "Save JSON to File",
                                             "Add Milestone"};
     public static String[] displayArray = firstMenu;
-
+    public static ProjectServiceImpl PService = new ProjectServiceImpl();
+    public static IssueTrackerImpl ITracker = new IssueTrackerImpl();
 
 	public static void main(String[] args) {
         int menuDepth = 0;
-		Scanner scanner = new Scanner(System.in);
-        selectionMenu(scanner, menuDepth);
-		scanner.close();
+        selectionMenu(menuDepth);
 	}
 
-    public static void selectionMenu(Scanner scanner, int menuDepth) {
+    public static void selectionMenu(int menuDepth) {
 
         printOptions();
-
-        int index = Integer.parseInt(getValidUserInput(scanner,"int"));
+        String toFunction = null;
+        int index = Integer.parseInt(getValidUserInput("int","Select an ID"));
         //String newString = getValidUserInput(scanner,"string");
 
         if (index >= 0 && index < displayArray.length) {
-            if(menuDepth == 0) {
-                switch(index) {
-                    case 0: System.out.println("Exiting!"); return;
-                    case 1: System.out.println("You selected Validate and Load Project...");
-                            drawBar();
-                            displayArray = secondMenu;
-                            menuDepth = 1;
-                            String toFunction = getValidUserInput(scanner,"string");
-                            break;
-                    case 2: System.out.println("You selected Validate and Load Project...");
-                            break;
-                }
-            }
+
             if(menuDepth == 1) {
                 switch(index) {
                     case 0: System.out.println("Returning back to main menu...");
@@ -52,23 +50,45 @@ public class Main {
                             displayArray = firstMenu;
                             menuDepth = 0;
                             break;
-                    case 1: break;
+                    case 1:
+                        String IDtoFunction = getValidUserInput("int","Please enter the new Milestone ID:");
+                        String StringToFunction = getValidUserInput("string","Please enter the new Milestone Name:");
+                        java.util.Set<String> issueIds = new java.util.HashSet<> ();
+                        issueIds.add("test");
+                        try{PService.createMilestone(IDtoFunction, StringToFunction, issueIds);} catch(IssueTrackingException e) {}
+                        break;
                     case 2: break;
                     case 3: break;
                     case 4: break;
                     case 5: break;
                     case 6: break;
-                    case 7: break;
-                    case 8: break;
+                    case 7: System.out.println("Listing Issues:");
+
+                            break;
+                    case 8: System.out.println("Printing JSON of current Project to Console:");
+                            try{PService.printJsonToConsole();} catch(IssueTrackingException e) {}
+                            break;
                     case 9: break;
 
+                }
+            }
+            if(menuDepth == 0) {
+                switch(index) {
+                    case 0: System.out.println("Exiting!"); return;
+                    case 1: drawBar();
+                        displayArray = secondMenu;
+                        menuDepth = 1;
+                        break;
+                    case 2: System.out.println("Creating new Project...");
+                        ITracker.create();
+                        break;
                 }
             }
         } else {
             System.out.println("Invalid Selection. Please try again.");
         }
 
-        selectionMenu(scanner, menuDepth);
+        selectionMenu(menuDepth);
     }
 
     public static void printOptions() {
@@ -79,22 +99,28 @@ public class Main {
         System.out.println("(" + 0 + ")" + " " + displayArray[0]);
     }
 
-    public static String getValidUserInput(Scanner scanner, String type) {
-        while (true) {
-            if (scanner.hasNextInt() && type == "int") {
+    public static String getValidUserInput(String type, String question) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println(question);
+        if (type == "int") {
+            if (scanner.hasNextInt()) {
                 return Integer.toString(scanner.nextInt());
             } else {
-                System.out.println("Invalid input. Please enter a number.");
+                System.out.println("Invalid input. Please enter a valid String.");
                 scanner.nextLine();
             }
+        }
 
-            if (scanner.hasNextLine() && type == "string") {
+        if (type == "string") {
+            if (scanner.hasNextLine()) {
                 return scanner.nextLine();
             } else {
                 System.out.println("Invalid input. Please enter a valid String.");
                 scanner.nextLine();
             }
         }
+
+        return "err";
     }
 
     public static void drawBar() {

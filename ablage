@@ -34,17 +34,28 @@ public class Main {
         //String newString = getValidUserInput(scanner,"string");
 
         if (index >= 0 && index < displayArray.length) {
-
-            switch(index) {
-                case 0: System.out.println("Exiting!"); return;
-                case 1: System.out.println("You selected Validate and Load Project...");
-                        drawBar();
-                        displayArray = secondMenu;
-                        menuDepth = 1;
-                        break;
-                case 2: break;
+            if(menuDepth == 0) {
+                switch(index) {
+                    case 0: System.out.println("Exiting!"); return;
+                    case 1: System.out.println("You selected Validate and Load Project...");
+                            drawBar();
+                            displayArray = secondMenu;
+                            menuDepth = 1;
+                            break;
+                    case 2: break;
+                }
             }
-
+            if(menuDepth == 1) {
+                switch(index) {
+                    case 0: System.out.println("Returning back to main menu...");
+                            drawBar();
+                            displayArray = firstMenu;
+                            menuDepth = 0;
+                            break;
+                    case 1: break;
+                    case 2: break;
+                }
+            }
         } else {
             System.out.println("Invalid Selection. Please try again.");
         }

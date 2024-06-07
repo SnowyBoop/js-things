@@ -1,8 +1,10 @@
 package de.uniba.wiai.dsg.ajp.assignment2;
-
+import java.util.*;
 import java.util.Scanner;
 import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
 import de.uniba.wiai.dsg.ajp.assignment2.issuetracking.logic.ProjectServiceImpl;
 import de.uniba.wiai.dsg.ajp.assignment2.issuetracking.logic.IssueTrackerImpl;
 import de.uniba.wiai.dsg.ajp.assignment2.issuetracking.IssueTrackingException;
@@ -35,7 +37,7 @@ public class Main {
 	}
 
     public static void selectionMenu(int menuDepth) {
-
+        Boolean switchMenu = false;
         printOptions();
         String toFunction = null;
         int index = Integer.parseInt(getValidUserInput("int","Select an ID"));
@@ -48,18 +50,33 @@ public class Main {
                     case 0: System.out.println("Returning back to main menu...");
                             drawBar();
                             displayArray = firstMenu;
-                            menuDepth = 0;
+                            switchMenu = true;
                             break;
                     case 1:
                         String IDtoFunction = getValidUserInput("int","Please enter the new Milestone ID:");
                         String StringToFunction = getValidUserInput("string","Please enter the new Milestone Name:");
-                        java.util.Set<String> issueIds = new java.util.HashSet<> ();
-                        issueIds.add("test");
-                        try{PService.createMilestone(IDtoFunction, StringToFunction, issueIds);} catch(IssueTrackingException e) {}
+                        String StringToDecoder = getValidUserInput("string","Please enter the Issue(s) ID(s) [can be multiple IDs comma seperated]:");
+                        java.util.Set<String> issueIds = csvToSet(StringToDecoder);
+                        try{PService.createMilestone(IDtoFunction, StringToFunction, issueIds);} catch(IssueTrackingException e) {System.out.println("Failed!");}
                         break;
-                    case 2: break;
-                    case 3: break;
-                    case 4: break;
+                    case 2:
+                        String IDtoRemove = getValidUserInput("int","Please enter the Milestone ID to be deleted:");
+                        try{PService.removeMilestoneById(IDtoRemove);} catch(IssueTrackingException e) {System.out.println("Failed!");}
+                        break;
+                    case 3:
+                        System.out.println(PService.getMilestones());
+                        break;
+                    case 4:
+                        String IssueID = getValidUserInput("int","Please enter the new Issue ID:");
+                        String IssueName = getValidUserInput("string","Please enter the new Issue Name:");
+                        String IssueDescription = getValidUserInput("string","Please enter the new Issue Description:");
+                        Severity IssueSeverity = Severity.valueOf(getValidUserInput("string","Please enter the new Issue Severity:"));
+                        Type IssueType = Type.valueOf(getValidUserInput("string","Please enter the new Issue Type:"));
+                        String IssueMilestoneID = getValidUserInput("int","Please enter the new Milestone ID:");
+                        String DependencyStringToDecoder = getValidUserInput("string","Please enter the Dependencies [can be multiple Dependencies comma seperated]:");
+                        java.util.Set<String> Dependencies = csvToSet(DependencyStringToDecoder);
+                        try{PService.createIssue(IssueID, IssueName, IssueDescription, IssueSeverity, IssueType, IssueMilestoneID, Dependencies);} catch(IssueTrackingException e) {System.out.println("Failed!");}
+                        break;
                     case 5: break;
                     case 6: break;
                     case 7: System.out.println("Listing Issues:");
@@ -77,7 +94,7 @@ public class Main {
                     case 0: System.out.println("Exiting!"); return;
                     case 1: drawBar();
                         displayArray = secondMenu;
-                        menuDepth = 1;
+                        switchMenu = true;
                         break;
                     case 2: System.out.println("Creating new Project...");
                         ITracker.create();
@@ -88,7 +105,17 @@ public class Main {
             System.out.println("Invalid Selection. Please try again.");
         }
 
-        selectionMenu(menuDepth);
+        if(switchMenu) {
+            if (menuDepth == 0) {
+                selectionMenu(1);
+            }
+            if (menuDepth == 1) {
+                selectionMenu(0);
+            }
+        }
+        else {
+            selectionMenu(menuDepth);
+        }
     }
 
     public static void printOptions() {
@@ -125,6 +152,12 @@ public class Main {
 
     public static void drawBar() {
         System.out.println("----------------------------------");
+    }
+
+    public static Set<String> csvToSet(String input) {
+        Set<String> s = new HashSet<>(Arrays.asList(input.split(",")));
+        return s;
+
     }
 
 }
